@@ -18,7 +18,7 @@
 </head>
 <body onload="init()">
 
-	<!-- <div data-role="page" id="login">
+	<div data-role="page" id="login">
 		<header data-role="header" class="header">
 			<h1>OSK Helper</h1>
 			<a href="#" data-icon="gear" data-iconpos="notext"></a>
@@ -27,26 +27,17 @@
 		<section data-role="content">
 			<p>Proszę wprowadzić poprawne dane logowania...</p>
 
-			<form action="" method="post">
-
-				<div data-role="fieldcontain" class="ui-field-contain ui-body ui-br">
-					<label for="username" class="ui-input-text">Login:</label>
-					<input type="text" name="username" id="username" class="ui-input-text ui-body-null ui-corner-all ui-shadow-inset ui-body-c">
-				</div>
-
-				<div data-role="fieldcontain" class="ui-field-contain ui-body ui-br">
-					<label for="password" class="ui-input-text">Hasło:</label>
-					<input type="password" name="password" id="password" class="ui-input-text ui-body-null ui-corner-all ui-shadow-inset ui-body-c">
-				</div>
-
-				<div data-theme="c" class="ui-btn ui-btn-corner-all ui-shadow ui-btn-up-c" aria-disabled="false"><span class="ui-btn-inner ui-btn-corner-all"><span class="ui-btn-text">Zaloguj się</span></span><input type="submit" name="login" value="Login" class="ui-btn-hidden" aria-disabled="false"></div>
+			<form id="loginForm" action="" method="post">
+        <input type="text" name="username" id="username" value="" placeholder="Login" />
+        <input type="password" name="password" id="password" value="" placeholder="Hasło" />
+				<input type="submit" name="login" value="Zaloguj" id="submitButton" />
 			</form>
 		</section>
 
 		<footer data-role="footer" class="footer">
 			<h4>&copy; 2012 -2013 Sebastian Troć</h4>
 		</footer>
-	</div><!-- /#login -->
+	</div><!-- /#login-->
 
 	<div data-role="page" id="home">
 
