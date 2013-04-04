@@ -67,6 +67,7 @@ var OSK_Helper = {
         window.loggedInAPI = true;
         $.mobile.changePage("#home");
         OSK_Helper.getPlacesFromAPI();
+        OSK_Helper.openWebSocket();
       },
       error : function(result) {
         alert("Coś się nie zgadza. Spróbuj ponownie.");
@@ -122,7 +123,26 @@ var OSK_Helper = {
     } else {
     	console.log('logged out');
     }
-	}
+	},
+
+
+  openWebSocket: function() {
+    var socket = io.connect('localhost', {
+      port: 3000
+    });
+    socket.on('connect',function() {
+      console.log('Client has connected to the server!');
+    });
+
+    socket.on('disablePlace', function(data){
+      console.log('place disabled');
+      console.log(data);
+    });
+
+    socket.on('disconnect',function() {
+      console.log('The client has disconnected!');
+    });
+  }
 
 }
 
