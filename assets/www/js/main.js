@@ -1,4 +1,5 @@
 window.loggedInAPI = false;
+window.socket = {};
 
 var OSK_Helper = {
 
@@ -9,7 +10,7 @@ var OSK_Helper = {
 	// serverAddress: 'http://oskhelper.eu01.aws.af.cm',
 	serverAddress: 'http://localhost:3000',
 
-
+  // Zapisuje pobrane place do HTML5 Web SQL
 	prepareDatabase_Places: function(data) {
 		var self = this;
 		// console.log('prepareDatabase_Places start');
@@ -30,11 +31,12 @@ var OSK_Helper = {
 		function() { // callback if success
 			console.log("Success!");
 			$('ul').listview('refresh');
+      OSK_Helper.clickPlaceHandle();
 		}
 	  );
 	},
 
-
+  // Pobiera liste placow z API
 	getPlacesFromAPI: function() {
 		// JSONP for Cross Domain JSON transfer
 		var placesJSON;
@@ -44,14 +46,24 @@ var OSK_Helper = {
 		});
 	},
 
-
+  // Renderuje liste placow na podstawie JSON z API
 	renderMainTemplate: function(jsonData) {
 		var template = $('#placesListElemTmpl').html();
 		var html = Mustache.to_html(template, jsonData);
 		$('#places-list').append(html);
 	},
 
+  // Renderuje szczegolowy widok placu po kliknieciu w element listy
+  renderDetailsTemplate: function(data) {
+    var template = $('#placesDetailsElemTmpl').html()
+     ,  html = Mustache.to_html(template, data)
+     ,  destinationElem = $('#placeDetailsContent');
 
+    destinationElem.html(html);
+    destinationElem.find('a').button();
+  },
+
+  // Obsluga logowania i wywolanie 
 	postLogin: function(u,p) {
 		$.ajax({
       url : OSK_Helper.serverAddress + "/api/login",
@@ -64,10 +76,7 @@ var OSK_Helper = {
         console.log(jqXHR.getAllResponseHeaders());
         window.localStorage["username"] = u;
         window.localStorage["password"] = p;
-        window.loggedInAPI = true;
-        $.mobile.changePage("#home");
-        OSK_Helper.getPlacesFromAPI();
-        OSK_Helper.openWebSocket();
+        OSK_Helper.onSuccessLogin();
       },
       error : function(result) {
         alert("Coś się nie zgadza. Spróbuj ponownie.");
@@ -78,6 +87,14 @@ var OSK_Helper = {
   	});
 	},
 
+  // Wywolanie kolejnych funkcji po pomyslnym zalogowaniu
+  onSuccessLogin: function() {
+    window.loggedInAPI = true;
+    $.mobile.changePage("#home");
+    OSK_Helper.getPlacesFromAPI();
+    OSK_Helper.openWebSocket();
+  },
+
 
 	logInAPI: function() {
 		var form = $("#loginForm");
@@ -87,21 +104,6 @@ var OSK_Helper = {
     var p = $("#password", form).val();
     if(u != '' && p!= '') {
 			OSK_Helper.postLogin(u,p);
-    	// $.post(OSK_Helper.serverAddress + "/api/login?callback=?", {username:u,password:p}, function(res) {
-    	// 	if(res == true) {
-     //      //store
-     //      window.localStorage["username"] = u;
-     //      window.localStorage["password"] = p;
-     //      window.loggedInAPI = true;
-     //      $.mobile.changePage("#home");
-     //      return true;
-     //    } else {
-     //    	alert("Coś się nie zgadza. Spróbuj ponownie.");
-     //    	$("#submitButton").removeAttr("disabled");
-     //    	// navigator.notification.alert("Coś się nie zgadza. Spróbuj ponownie.", function() {});
-     //    }
-     //    $("#submitButton").removeAttr("disabled");
-     //  },"json");
     } else {
   		alert("Proszę wprowadzić poprawne dane logowania...");
       // navigator.notification.alert("Proszę wprowadzić poprawne dane logowania...", function() {});
@@ -127,22 +129,62 @@ var OSK_Helper = {
 
 
   openWebSocket: function() {
-    var socket = io.connect('localhost', {
+    window.socket = io.connect('localhost', {
       port: 3000
     });
+    var socket = window.socket;
+
     socket.on('connect',function() {
       console.log('Client has connected to the server!');
     });
 
     socket.on('disablePlace', function(data){
-      console.log('place disabled');
-      console.log(data);
+      console.log('disaplePlace: '+ data.place);
+      $('#place_'+data.place).closest('li').addClass('disabled');
     });
 
     socket.on('disconnect',function() {
       console.log('The client has disconnected!');
     });
+  },
+
+
+  // getInstructorID: function() {
+  //   return window.localStorage["username"];
+  // },
+
+
+  occupyPlace: function(placeID) {
+    // W przyszlosci do tworzenia logow dla admina 
+    // i do wyswietlania kto zajmuje plac.
+    // Funkcja powyzej tez zakomentowana.
+    // Do parametrow ponizej trzeba bedzie dodac tego usera
+
+    // var instructor = OSK_Helper.getInstructorID;
+    var socket = window.socket;
+    socket.emit('placeIsOccupied', {place: placeID})
+  },
+
+
+  clickPlaceHandle: function() {
+    $('.occupyPlaceTrigger').on('click', function(e){
+      // console.log('clicked');
+      // e.preventDefault();
+      var that = $(this)
+       ,  thatID = that.data('place');
+
+      var data = {
+        thatPlaceID: thatID,
+        thatPlaceName: that.find('h3').text(),
+        thatPlaceAddress: that.find('p').text()
+      };
+
+      OSK_Helper.occupyPlace(thatID);
+      $.mobile.changePage('#about');
+      OSK_Helper.renderDetailsTemplate(data);
+    })
   }
+
 
 }
 
