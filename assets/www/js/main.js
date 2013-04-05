@@ -29,7 +29,7 @@ var OSK_Helper = {
 			console.log(err);
 		},
 		function() { // callback if success
-			console.log("Success!");
+			// console.log("Success!");
 			$('ul').listview('refresh');
       OSK_Helper.clickPlaceHandle();
 		}
@@ -73,7 +73,6 @@ var OSK_Helper = {
       contentType : "application/json; charset=utf-8",
       data : {username:u,password:p},
       success : function(result, textStatus, jqXHR) {
-        console.log(jqXHR.getAllResponseHeaders());
         window.localStorage["username"] = u;
         window.localStorage["password"] = p;
         OSK_Helper.onSuccessLogin();
@@ -115,15 +114,14 @@ var OSK_Helper = {
 
   checkPreAuth: function() {
   	$("#submitButton",form).click(OSK_Helper.logInAPI);
-		console.log("checkPreAuth:");
     var form = $("#loginForm");
     if(window.localStorage["username"] != undefined && window.localStorage["password"] != undefined) {
-    	console.log('logged in');
+    	console.log('checkPreAuth: logged in');
       $("#username", form).val(window.localStorage["username"]);
       $("#password", form).val(window.localStorage["password"]);
       $("#submitButton",form).click();
     } else {
-    	console.log('logged out');
+    	console.log('checkPreAuth: logged out');
     }
 	},
 
@@ -135,7 +133,7 @@ var OSK_Helper = {
     var socket = window.socket;
 
     socket.on('connect',function() {
-      console.log('Client has connected to the server!');
+      console.log('Socket.IO: Client has connected to the server!');
     });
 
     socket.on('disablePlace', function(data){
@@ -143,8 +141,13 @@ var OSK_Helper = {
       $('#place_'+data.place).closest('li').addClass('disabled');
     });
 
+    socket.on('enablePlace', function(data){
+      console.log('enablePlace: '+ data.place);
+      $('#place_'+data.place).closest('li').removeClass('disabled');
+    });
+
     socket.on('disconnect',function() {
-      console.log('The client has disconnected!');
+      console.log('Socket.IO: The client has disconnected!');
     });
   },
 
@@ -162,14 +165,17 @@ var OSK_Helper = {
 
     // var instructor = OSK_Helper.getInstructorID;
     var socket = window.socket;
-    socket.emit('placeIsOccupied', {place: placeID})
+    socket.emit('placeIsOccupied', {place: placeID});
+  },
+
+  releasePlace: function(placeID) {
+    var socket = window.socket;
+    socket.emit('placeIsFree', {place: placeID})
   },
 
 
   clickPlaceHandle: function() {
-    $('.occupyPlaceTrigger').on('click', function(e){
-      // console.log('clicked');
-      // e.preventDefault();
+    $('.occupyPlaceTrigger').on('click', function(){
       var that = $(this)
        ,  thatID = that.data('place');
 
@@ -182,6 +188,23 @@ var OSK_Helper = {
       OSK_Helper.occupyPlace(thatID);
       $.mobile.changePage('#about');
       OSK_Helper.renderDetailsTemplate(data);
+      OSK_Helper.clickReturnPlaces();
+    })
+  },
+
+
+  clickReturnPlaces: function() {
+    $('#releasePlace').on('click', function(){
+      var that = $(this)
+       ,  thatID = that.data('place');
+
+      var data = {
+        thatPlaceID: thatID,
+      };
+
+      OSK_Helper.releasePlace(thatID);
+      $.mobile.changePage('#home');
+      // OSK_Helper.renderDetailsTemplate(data);
     })
   }
 
