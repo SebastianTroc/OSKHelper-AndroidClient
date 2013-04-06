@@ -7,8 +7,8 @@ var OSK_Helper = {
 		OSK_Helper.checkPreAuth();
 	},
 
-	// serverAddress: 'http://oskhelper.eu01.aws.af.cm',
-	serverAddress: 'http://localhost:3000',
+	serverAddress: 'http://oskhelper.eu01.aws.af.cm',
+	// serverAddress: 'http://localhost:3000',
 
   // Zapisuje pobrane place do HTML5 Web SQL
 	prepareDatabase_Places: function(data) {
@@ -127,8 +127,11 @@ var OSK_Helper = {
 
 
   openWebSocket: function() {
-    window.socket = io.connect('localhost', {
-      port: 3000
+    // window.socket = io.connect('localhost', {
+    //   port: 3000
+    // });
+    window.socket = io.connect('oskhelper.eu01.aws.af.cm', {
+      port: 80
     });
     var socket = window.socket;
 
@@ -175,20 +178,33 @@ var OSK_Helper = {
 
 
   clickPlaceHandle: function() {
-    $('.occupyPlaceTrigger').on('click', function(){
+    $('.occupyPlaceTrigger').on('click', function(e){
+      e.stopPropagation();
+      e.preventDefault();
+
       var that = $(this)
-       ,  thatID = that.data('place');
+       ,  thatID = that.data('place')
+       ,  thatContainer = that.closest('li');
+       console.log(thatContainer);
 
-      var data = {
-        thatPlaceID: thatID,
-        thatPlaceName: that.find('h3').text(),
-        thatPlaceAddress: that.find('p').text()
-      };
+      if ( thatContainer.hasClass('disabled') ) {
 
-      OSK_Helper.occupyPlace(thatID);
-      $.mobile.changePage('#about');
-      OSK_Helper.renderDetailsTemplate(data);
-      OSK_Helper.clickReturnPlaces();
+        alert('Ten plac jest zajęty!');
+
+      } else {
+        var data = {
+          thatPlaceID: thatID,
+          thatPlaceName: that.find('h3').text(),
+          thatPlaceAddress: that.find('p').text()
+        };
+
+        OSK_Helper.occupyPlace(thatID);
+        OSK_Helper.renderDetailsTemplate(data);
+        OSK_Helper.clickReturnPlaces();
+        $.mobile.changePage('#about', { transition: "slide" });
+
+      }
+
     })
   },
 
@@ -203,7 +219,8 @@ var OSK_Helper = {
       };
 
       OSK_Helper.releasePlace(thatID);
-      $.mobile.changePage('#home');
+      // $.mobile.changePage('back', { transition: "slide" });
+      $.mobile.back();
       // OSK_Helper.renderDetailsTemplate(data);
     })
   }

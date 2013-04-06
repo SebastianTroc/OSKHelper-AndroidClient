@@ -14,7 +14,8 @@
 	<script src="js/underscore-min.js"></script>
 	<script src="js/backbone-min.js"></script>
 	<script src="js/mustache.js"></script>
-	<script src="http://localhost:3000/socket.io/socket.io.js"></script>
+	<!-- <script src="http://localhost:3000/socket.io/socket.io.js"></script> -->
+	<script src="http://oskhelper.eu01.aws.af.cm/socket.io/socket.io.js"></script>
 	<script src="js/main.js"></script>
 
 </head>
@@ -79,7 +80,7 @@
 
 	<script id="placesListElemTmpl" type="text/template">
 		<li>
-			<a href="#" data-transition="slide" data-place="{{_id}}" id="place_{{_id}}" class="occupyPlaceTrigger">
+			<a href="#" data-place="{{_id}}" id="place_{{_id}}" class="occupyPlaceTrigger">
 				<img src="assets/{{photo}}" alt="{{name}}" />
 				<h3>{{name}}</h3>
 				<p>{{address}}</p>
