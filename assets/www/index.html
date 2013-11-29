@@ -6,13 +6,25 @@
 	<meta name="viewport" content="user-scalable=no, initial-scale=1, minimum-scale=1, maximum-scale=1, width=device-width, height=device-height, targed-densitydpi=device-dpi">
 	<title>OSK Helper</title>
 	<script type="text/javascript" charset="utf-8" src="cordova-2.5.0.js"></script>
-	<link rel="stylesheet"  href="css/themes/default/jquery.mobile-1.3.0.css" />
-	<link rel="stylesheet"  href="css/themes/default/styles.css" />
+
+	<!-- jQueryMobileCSS - original without styling -->
+	<link rel="stylesheet"  href="css/themes/nativeDroid/jquerymobile.css" />
+	<!-- nativeDroid core CSS -->
+	<link rel="stylesheet"  href="css/themes/nativeDroid/jquerymobile.nativedroid.css" />
+	<!-- nativeDroid: Light/Dark -->
+	<link rel="stylesheet"  href="css/themes/nativeDroid/jquerymobile.nativedroid.light.css" id='jQMnDTheme' />
+	<!-- nativeDroid: Color Schemes -->
+	<link rel="stylesheet"  href="css/themes/nativeDroid/jquerymobile.nativedroid.color.green.css" id='jQMnDColor' />
+	<!-- FontAwesome - http://fortawesome.github.io/Font-Awesome/ -->
+	<link rel="stylesheet"  href="css/themes/nativeDroid/font-awesome.min.css" />
+
+	<!-- jQuery / jQueryMobile Scripts -->
 	<script src="js/jquery.js"></script>
 	<script src="js/jquery.mobile-1.3.0.min.js"></script>
+
+	<script src="js/nativedroid.script.js"></script>
 	<script src="js/json2.js"></script>
 	<script src="js/underscore-min.js"></script>
-	<script src="js/backbone-min.js"></script>
 	<script src="js/mustache.js"></script>
 	<!-- <script src="http://localhost:3000/socket.io/socket.io.js"></script> -->
 	<script src="http://oskhelper.eu01.aws.af.cm/socket.io/socket.io.js"></script>
@@ -21,8 +33,8 @@
 </head>
 <body onload="init()">
 
-	<div data-role="page" id="login">
-		<header data-role="header" class="header">
+	<div data-role="page" id="login" data-theme='b'>
+		<header data-role="header" data-position="fixed" class="header" data-tap-toggle="false" data-theme='b'>
 			<h1>OSK Helper</h1>
 			<a href="#" data-icon="gear" data-iconpos="notext"></a>
 		</header>
@@ -42,16 +54,19 @@
 		</footer>
 	</div><!-- /#login-->
 
-	<div data-role="page" id="home">
+	<div data-role="page" id="home" data-theme='b'>
 
-		<header data-role="header" class="header">
-			<h1>OSK Helper</h1>
+		<header data-role="header" data-tap-toggle="false" data-theme='b'>
+			<h1>
+				<a href="#"><i class='icon-dashboard'></i></a>
+				OSK Helper
+			</h1>
 			<a href="#" data-icon="gear" data-iconpos="notext"></a>
 		</header>
 
 		<section data-role="content">
-			<ul id="places-list" data-role="listview" class="ui-listview" data-filter="true">
-
+			<ul id="places-list" data-role="listview" data-inset="false" data-icon="false" data-filter-placeholder='Szukaj placu...' data-filter-theme='b' data-filter="true">
+				<li data-role="list-divider">Place manewrowe <span id="" class="ui-li-count">Wolnych: 9</span></li>
 			</ul>
 		</section>
 
@@ -62,12 +77,14 @@
 	</div><!-- /#home -->
 
 
-	<div data-role="page" id="about">
-		<header data-role="header" data-position="inline">
-			<!-- <a href="#" data-icon="back" data-rel="back">Powrót</a> -->
-			<h1>Zajęty plac</h1>
-			<a href="#" data-icon="gear" data-iconpos=notext></a>
-		</header><!-- /header -->
+	<div data-role="page" id="about" data-theme='b'>
+		<header data-role="header" data-tap-toggle="false" data-theme='b'>
+			<h1>
+				<a href="#"><i class='icon-road'></i></a>
+				Wybrany plac
+			</h1>
+			<a href="#" data-icon="gear" data-iconpos="notext"></a>
+		</header>
 
 		<section id="placeDetailsContent" data-role="content">
 			
@@ -80,17 +97,20 @@
 
 	<script id="placesListElemTmpl" type="text/template">
 		<li>
-			<a href="#" data-place="{{_id}}" id="place_{{_id}}" class="occupyPlaceTrigger">
+			<a href="#" data-place="{{_id}}"  data-rel='popup' id="place_{{_id}}" class="occupyPlaceTrigger">
 				<img src="assets/{{photo}}" alt="{{name}}" />
-				<h3>{{name}}</h3>
+				<h2>{{name}}</h2>
 				<p>{{address}}</p>
+				<p class="ui-li-aside"><strong>10</strong> km</p>
 			</a>
 		</li>
 	</script>
 
 	<script id="placesDetailsElemTmpl" type="text/template">
 		<p class="center">
-			Zajmujesz teraz plac <strong>{{thatPlaceName}}</strong><br>
+			<h2>
+				Zajmujesz teraz plac <strong>{{thatPlaceName}}</strong><br>
+			</h2>
 			pod adresem: <b>{{thatPlaceAddress}}</b>
 			<hr>
 			<a href="#" id="releasePlace" data-place="{{thatPlaceID}}">Zwolnij plac</a>

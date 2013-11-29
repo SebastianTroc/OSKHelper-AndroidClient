@@ -140,7 +140,7 @@ var OSK_Helper = {
     });
 
     socket.on('disablePlace', function(data){
-      console.log('disaplePlace: '+ data.place);
+      console.log('disablePlace: '+ data.place);
       $('#place_'+data.place).closest('li').addClass('disabled');
     });
 
@@ -185,7 +185,7 @@ var OSK_Helper = {
       var that = $(this)
        ,  thatID = that.data('place')
        ,  thatContainer = that.closest('li');
-       console.log(thatContainer);
+       // console.log(thatContainer);
 
       if ( thatContainer.hasClass('disabled') ) {
 
