@@ -4,56 +4,59 @@ window.socket = {};
 var OSK_Helper = {
 
 	init: function() {
+    $.mobile.changePage("#splashscreen");
 		OSK_Helper.checkPreAuth();
 	},
 
-	serverAddress: 'http://oskhelper.eu01.aws.af.cm',
-	// serverAddress: 'http://localhost:3000',
+	// serverAddress: 'http://oskhelper.eu01.aws.af.cm',
+	serverAddress: 'http://localhost:3000',
 
-  // Zapisuje pobrane place do HTML5 Web SQL
+  // save downloaded places to HTML5 WebStorage
 	prepareDatabase_Places: function(data) {
-		var self = this;
-		// console.log('prepareDatabase_Places start');
+		var self = this
+    ,   freePlaces = 0; // free places counter
 	  this.db = openDatabase("oskhelperdb", "1.0", "Place manewrowe", 5*1024*1024);
-	  this.db.transaction(function(tx){ // function body
-  		// console.log('transaction start');
+	  this.db.transaction(function(tx){
   		tx.executeSql('DROP TABLE IF EXISTS places');
       tx.executeSql('CREATE TABLE IF NOT EXISTS places (id unique, address, name, photo, occupated)');
       $.each(data.places, function(index, elem){
 				tx.executeSql('INSERT INTO places (id, address, name, photo, occupated) VALUES ("'+ elem._id + '", "' + elem.address + '", "'	+ elem.name + '", "'	+ elem.photo + '", "'	+ elem.occupated + '")');
-				OSK_Helper.renderMainTemplate(elem);
+				OSK_Helper.renderPlacesList(elem); // render place list item
+        freePlaces++; // increment free places count
 			});
-			// console.log('finished filling');
 	  },
 	  function(err) { // callback if error
 			console.log(err);
 		},
 		function() { // callback if success
-			// console.log("Success!");
-			$('ul').listview('refresh');
       OSK_Helper.clickPlaceHandle();
-		}
-	  );
+
+      var placesListHeader = '<li data-role="list-divider">Place manewrowe <span id="places-counter" class="ui-li-count">Wolnych: '+ freePlaces +'</span></li>'
+      $('#places-list').prepend(placesListHeader);
+      
+      $.mobile.changePage("#places");
+      $('#places-list').listview('refresh');
+    });
 	},
 
-  // Pobiera liste placow z API
+  // downloads places list from API
 	getPlacesFromAPI: function() {
 		// JSONP for Cross Domain JSON transfer
 		var placesJSON;
-		$.getJSON(this.serverAddress + '/api/places?callback=?',	function(data){
+		$.getJSON(this.serverAddress + '/api/places?callback=?', function(data){
 			placesJSON = data;
 			OSK_Helper.prepareDatabase_Places(placesJSON);
 		});
 	},
 
-  // Renderuje liste placow na podstawie JSON z API
-	renderMainTemplate: function(jsonData) {
+  // Renders places list based on JSON from API
+	renderPlacesList: function(jsonData) {
 		var template = $('#placesListElemTmpl').html();
 		var html = Mustache.to_html(template, jsonData);
 		$('#places-list').append(html);
 	},
 
-  // Renderuje szczegolowy widok placu po kliknieciu w element listy
+  // Renders place's details on click at places list element
   renderDetailsTemplate: function(data) {
     var template = $('#placesDetailsElemTmpl').html()
      ,  html = Mustache.to_html(template, data)
@@ -63,7 +66,7 @@ var OSK_Helper = {
     destinationElem.find('a').button();
   },
 
-  // Obsluga logowania i wywolanie 
+  // Signing in handlers
 	postLogin: function(u,p) {
 		$.ajax({
       url : OSK_Helper.serverAddress + "/api/login",
@@ -75,6 +78,8 @@ var OSK_Helper = {
       success : function(result, textStatus, jqXHR) {
         window.localStorage["username"] = u;
         window.localStorage["password"] = p;
+        window.localStorage["instructor_id"] = result.instructor_id;
+        console.log(result);
         OSK_Helper.onSuccessLogin();
       },
       error : function(result) {
@@ -86,12 +91,12 @@ var OSK_Helper = {
   	});
 	},
 
-  // Wywolanie kolejnych funkcji po pomyslnym zalogowaniu
+  // Signing in success callback
   onSuccessLogin: function() {
     window.loggedInAPI = true;
-    $.mobile.changePage("#home");
     OSK_Helper.getPlacesFromAPI();
     OSK_Helper.openWebSocket();
+    //$.mobile.changePage("#places");
   },
 
 
@@ -112,20 +117,22 @@ var OSK_Helper = {
   },
 
 
+  // Auto login if found credentials in WebStorage
   checkPreAuth: function() {
   	$("#submitButton",form).click(OSK_Helper.logInAPI);
     var form = $("#loginForm");
     if(window.localStorage["username"] != undefined && window.localStorage["password"] != undefined) {
-    	console.log('checkPreAuth: logged in');
+    	// console.log('checkPreAuth: logged in');
       $("#username", form).val(window.localStorage["username"]);
       $("#password", form).val(window.localStorage["password"]);
       $("#submitButton",form).click();
-    } else {
-    	console.log('checkPreAuth: logged out');
+    // } else {
+    	// console.log('checkPreAuth: logged out');
     }
 	},
 
 
+  // Establishing Socket.io connection and configure socket's events
   openWebSocket: function() {
     // window.socket = io.connect('localhost', {
     //   port: 3000
@@ -156,7 +163,7 @@ var OSK_Helper = {
 
 
   // getInstructorID: function() {
-  //   return window.localStorage["username"];
+  //   return window.localStorage["instructor_id"];
   // },
 
 
@@ -184,8 +191,9 @@ var OSK_Helper = {
 
       var that = $(this)
        ,  thatID = that.data('place')
+       ,  thatCoords = that.data('coords')
        ,  thatContainer = that.closest('li');
-       // console.log(thatContainer);
+       console.log(thatContainer);
 
       if ( thatContainer.hasClass('disabled') ) {
 
@@ -194,14 +202,16 @@ var OSK_Helper = {
       } else {
         var data = {
           thatPlaceID: thatID,
-          thatPlaceName: that.find('h3').text(),
-          thatPlaceAddress: that.find('p').text()
+          thatPlaceName: that.find('.place-name').text(),
+          thatPlaceCoords: thatCoords,
+          thatPlaceAddress: that.find('.address').text()
         };
 
         OSK_Helper.occupyPlace(thatID);
+        console.log(data);
         OSK_Helper.renderDetailsTemplate(data);
         OSK_Helper.clickReturnPlaces();
-        $.mobile.changePage('#about', { transition: "slide" });
+        $.mobile.changePage('#place-details', { role: "dialog" });
 
       }
 
@@ -227,7 +237,3 @@ var OSK_Helper = {
 
 
 }
-
-function init() {
-	OSK_Helper.init();
-};

@@ -1,0 +1,5 @@
+@import 'android-loader.css';
+
+#splashscreen .loading {
+	margin: 50% auto;	
+}

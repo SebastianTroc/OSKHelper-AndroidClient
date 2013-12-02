@@ -17,6 +17,8 @@
 	<link rel="stylesheet"  href="css/themes/nativeDroid/jquerymobile.nativedroid.color.green.css" id='jQMnDColor' />
 	<!-- FontAwesome - http://fortawesome.github.io/Font-Awesome/ -->
 	<link rel="stylesheet"  href="css/themes/nativeDroid/font-awesome.min.css" />
+	<!-- Custim styles -->
+	<link rel="stylesheet" href="css/custom-styles.css">
 
 	<!-- jQuery / jQueryMobile Scripts -->
 	<script src="js/jquery.js"></script>
@@ -31,59 +33,90 @@
 	<script src="js/main.js"></script>
 
 </head>
-<body onload="init()">
+<body onload="OSK_Helper.init()">
 
-	<div data-role="page" id="login" data-theme='b'>
+	<div data-role="page" id="splashscreen" data-theme='b'>
 		<header data-role="header" data-position="fixed" class="header" data-tap-toggle="false" data-theme='b'>
-			<h1>OSK Helper</h1>
-			<a href="#" data-icon="gear" data-iconpos="notext"></a>
+			<h1>
+				<a href="#"><i class='icon-dashboard'></i></a>
+				OSK Helper
+			</h1>
 		</header>
 
 		<section data-role="content">
-			<p>Proszę wprowadzić poprawne dane logowania...</p>
-
-			<form id="loginForm" action="" method="post">
-        <input type="text" name="username" id="username" value="" placeholder="Login" />
-        <input type="password" name="password" id="password" value="" placeholder="Hasło" />
-				<input type="submit" name="login" value="Zaloguj" id="submitButton" />
-			</form>
+			<div class="loading">
+		    <div class="outer"></div>
+		    <div class="inner"></div>
+			</div>
 		</section>
 
-		<footer data-role="footer" class="footer">
+		<footer data-role="footer" data-position="fixed" class="footer">
 			<h4>&copy; 2012 -2013 Sebastian Troć</h4>
 		</footer>
 	</div><!-- /#login-->
 
-	<div data-role="page" id="home" data-theme='b'>
+	<div data-role="page" id="login" data-theme='b'>
+		<header data-role="header" data-position="fixed" class="header" data-tap-toggle="false" data-theme='b'>
+			<h1>
+				<a href="#"><i class='icon-dashboard'></i></a>
+				OSK Helper
+			</h1>
+		</header>
+
+		<section data-role="content">
+
+			<div class="inset">
+				<h2>Proszę wprowadzić poprawne dane logowania...</h2>
+				
+				<form id="loginForm" action="" method="post">
+	        <input type="text" name="username" id="username" value="" placeholder="Login" />
+	        <input type="password" name="password" id="password" value="" placeholder="Hasło" />
+					<button type="submit" name="login" id="submitButton" data-theme="b">Zaloguj</button>
+				</form>
+			</div>
+		</section>
+
+		<footer data-role="footer" data-position="fixed" class="footer">
+			<h4>&copy; 2012 -2013 Sebastian Troć</h4>
+		</footer>
+	</div><!-- /#login-->
+
+
+
+	<div data-role="page" id="places" data-theme='b'>
 
 		<header data-role="header" data-tap-toggle="false" data-theme='b'>
 			<h1>
 				<a href="#"><i class='icon-dashboard'></i></a>
 				OSK Helper
 			</h1>
-			<a href="#" data-icon="gear" data-iconpos="notext"></a>
 		</header>
 
 		<section data-role="content">
 			<ul id="places-list" data-role="listview" data-inset="false" data-icon="false" data-filter-placeholder='Szukaj placu...' data-filter-theme='b' data-filter="true">
-				<li data-role="list-divider">Place manewrowe <span id="" class="ui-li-count">Wolnych: 9</span></li>
 			</ul>
 		</section>
 
-		<footer data-role="footer" class="footer">
-			<h4>&copy; 2012 -2013 Sebastian Troć</h4>
-		</footer>
+		<div data-position="fixed" data-tap-toggle="false" data-role="footer" data-tap-toggle="false" data-theme='b'>
+			<div data-role="navbar">
+				<ul>
+					<li><a href="#" class="ui-btn-active" data-icon="map-marker">Place</a></li>
+					<li><a href="#instructors" data-icon="user">Instruktorzy</a></li>
+					<li><a href="#settings" data-icon="cogs">Ustawienia</a></li>
+				</ul>
+			</div>
+		</div>
 
-	</div><!-- /#home -->
+	</div><!-- /#places -->
 
 
-	<div data-role="page" id="about" data-theme='b'>
+
+	<div data-role="page" id="place-details" data-theme='b'>
 		<header data-role="header" data-tap-toggle="false" data-theme='b'>
 			<h1>
 				<a href="#"><i class='icon-road'></i></a>
 				Wybrany plac
 			</h1>
-			<a href="#" data-icon="gear" data-iconpos="notext"></a>
 		</header>
 
 		<section id="placeDetailsContent" data-role="content">
@@ -93,28 +126,92 @@
 		<footer data-role="footer" class="footer">
 			<h4>&copy; 2012 - 2013 Sebastian Troć</h4>
 		</footer>
-	</div><!-- /#about -->
+	</div><!-- /#place-details -->
+
+
+
+	<div data-role="page" id="instructors" data-theme='b'>
+
+		<header data-role="header" data-tap-toggle="false" data-theme='b'>
+			<h1>
+				<a href="#"><i class='icon-dashboard'></i></a>
+				OSK Helper
+			</h1>
+		</header>
+
+		<section data-role="content">
+			<ul id="instructors-list" data-role="listview" data-inset="false" data-icon="false" data-filter-placeholder='Szukaj placu...' data-filter-theme='b' data-filter="true">
+				<li data-role="list-divider">Instruktorzy</li>
+			</ul>
+		</section>
+
+		<div data-position="fixed" data-tap-toggle="false" data-role="footer" data-tap-toggle="false" data-theme='b'>
+			<div data-role="navbar">
+				<ul>
+					<li><a href="#places" data-icon="map-marker">Place</a></li>
+					<li><a href="#" class="ui-btn-active" data-icon="user">Instruktorzy</a></li>
+					<li><a href="#settings" data-icon="cogs">Ustawienia</a></li>
+				</ul>
+			</div>
+		</div>
+
+	</div><!-- /#instructors -->
+
+
+
+	<div data-role="page" id="settings" data-theme='b'>
+
+		<header data-role="header" data-tap-toggle="false" data-theme='b'>
+			<h1>
+				<a href="#"><i class='icon-gear'></i></a>
+				OSK Helper
+			</h1>
+		</header>
+
+		<section data-role="content">
+			<div class="inset">
+				<h2>Aktualizacja</h2>
+
+				hr
+				<h2>Wyloguj</h2>
+			</div>
+		</section>
+
+		<div data-position="fixed" data-tap-toggle="false" data-role="footer" data-tap-toggle="false" data-theme='b'>
+			<div data-role="navbar">
+				<ul>
+					<li><a href="#places" data-icon="map-marker">Place</a></li>
+					<li><a href="#instructors" data-icon="user">Instruktorzy</a></li>
+					<li><a href="#" class="ui-btn-active" data-icon="cogs">Ustawienia</a></li>
+				</ul>
+			</div>
+		</div>
+
+	</div><!-- /#settings -->
+
+
 
 	<script id="placesListElemTmpl" type="text/template">
-		<li>
-			<a href="#" data-place="{{_id}}"  data-rel='popup' id="place_{{_id}}" class="occupyPlaceTrigger">
+		<li class="place">
+			<a href="#" data-place="{{_id}}" data-coords="12, 34" id="place_{{_id}}" class="occupyPlaceTrigger">
 				<img src="assets/{{photo}}" alt="{{name}}" />
-				<h2>{{name}}</h2>
-				<p>{{address}}</p>
+				<h2 class="place-name">{{name}}</h2>
+				<p class="address">{{address}}</p>
 				<p class="ui-li-aside"><strong>10</strong> km</p>
 			</a>
 		</li>
 	</script>
 
 	<script id="placesDetailsElemTmpl" type="text/template">
-		<p class="center">
+		<div class="inset">
 			<h2>
-				Zajmujesz teraz plac <strong>{{thatPlaceName}}</strong><br>
+				Zajmujesz teraz plac <strong class="place-name">{{thatPlaceName}}</strong><br>
 			</h2>
-			pod adresem: <b>{{thatPlaceAddress}}</b>
+			pod adresem: <strong class="address">{{thatPlaceAddress}}</strong> <br>
+			o współrzędnych: <strong class="coordinates"></strong>
 			<hr>
 			<a href="#" id="releasePlace" data-place="{{thatPlaceID}}">Zwolnij plac</a>
-		</p>
+		</div>
 	</script>
 
 </body>
