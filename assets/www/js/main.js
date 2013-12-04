@@ -122,24 +122,25 @@ var OSK_Helper = {
   	$("#submitButton",form).click(OSK_Helper.logInAPI);
     var form = $("#loginForm");
     if(window.localStorage["username"] != undefined && window.localStorage["password"] != undefined) {
-    	// console.log('checkPreAuth: logged in');
+    	console.log('checkPreAuth: logged in');
       $("#username", form).val(window.localStorage["username"]);
       $("#password", form).val(window.localStorage["password"]);
       $("#submitButton",form).click();
-    // } else {
-    	// console.log('checkPreAuth: logged out');
+    } else {
+      console.log('checkPreAuth: logged out');
+      $.mobile.changePage("#login");
     }
 	},
 
 
   // Establishing Socket.io connection and configure socket's events
   openWebSocket: function() {
-    // window.socket = io.connect('localhost', {
-    //   port: 3000
-    // });
-    window.socket = io.connect('oskhelper.eu01.aws.af.cm', {
-      port: 80
+    window.socket = io.connect('localhost', {
+      port: 3000
     });
+    // window.socket = io.connect('oskhelper.eu01.aws.af.cm', {
+    //   port: 80
+    // });
     var socket = window.socket;
 
     socket.on('connect',function() {
