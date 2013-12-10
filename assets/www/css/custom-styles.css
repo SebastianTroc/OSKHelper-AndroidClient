@@ -1,5 +1,12 @@
+/* Splash screen */
 @import 'android-loader.css';
 
 #splashscreen .loading {
 	margin: 50% auto;	
+}
+
+
+/* Places list */
+#places li.disabled {
+	opacity: .5;
 }

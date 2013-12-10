@@ -18,12 +18,12 @@ var OSK_Helper = {
 	  this.db = openDatabase("oskhelperdb", "1.0", "Place manewrowe", 5*1024*1024);
 	  this.db.transaction(function(tx){
   		tx.executeSql('DROP TABLE IF EXISTS places');
-      tx.executeSql('CREATE TABLE IF NOT EXISTS places (id unique, address, name, photo, occupated)');
+      tx.executeSql('CREATE TABLE IF NOT EXISTS places (id unique, address, name, photo, occupated, coordinates)');
       $.each(data.places, function(index, elem){
-				tx.executeSql('INSERT INTO places (id, address, name, photo, occupated) VALUES ("'+ elem._id + '", "' + elem.address + '", "'	+ elem.name + '", "'	+ elem.photo + '", "'	+ elem.occupated + '")');
-				OSK_Helper.renderPlacesList(elem); // render place list item
+        tx.executeSql('INSERT INTO places (id, address, name, photo, occupated, coordinates) VALUES ("'+ elem._id + '", "' + elem.address + '", "' + elem.name + '", "'  + elem.photo + '", "' + elem.occupated + '", "' + elem.coordinates.lat + ',' + elem.coordinates.lng + '")');
+        OSK_Helper.renderPlacesList(elem); // render place list item
         freePlaces++; // increment free places count
-			});
+      });
 	  },
 	  function(err) { // callback if error
 			console.log(err);
@@ -64,6 +64,21 @@ var OSK_Helper = {
 
     destinationElem.html(html);
     destinationElem.find('a').button();
+
+    var map_container = destinationElem.find('#map');
+    var placeCenter = [data.thatPlaceCoords.lat, data.thatPlaceCoords.lng];
+
+    map_container.gmap3({
+      map: {
+        options: {
+          center: placeCenter,
+          zoom: 16
+        }
+      },
+      marker: {
+        latLng: placeCenter
+      }
+    });
   },
 
   // Signing in handlers
@@ -79,7 +94,6 @@ var OSK_Helper = {
         window.localStorage["username"] = u;
         window.localStorage["password"] = p;
         window.localStorage["instructor_id"] = result.instructor_id;
-        console.log(result);
         OSK_Helper.onSuccessLogin();
       },
       error : function(result) {
@@ -192,9 +206,12 @@ var OSK_Helper = {
 
       var that = $(this)
        ,  thatID = that.data('place')
-       ,  thatCoords = that.data('coords')
+       ,  thatCoords = {
+          lat: that.data('lat'),
+          lng: that.data('lng')
+       }
        ,  thatContainer = that.closest('li');
-       console.log(thatContainer);
+       //console.log(thatContainer);
 
       if ( thatContainer.hasClass('disabled') ) {
 

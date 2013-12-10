@@ -20,6 +20,7 @@
 	<!-- Custim styles -->
 	<link rel="stylesheet" href="css/custom-styles.css">
 
+
 	<!-- jQuery / jQueryMobile Scripts -->
 	<script src="js/jquery.js"></script>
 	<script src="js/jquery.mobile-1.3.0.min.js"></script>
@@ -28,6 +29,9 @@
 	<script src="js/json2.js"></script>
 	<script src="js/underscore-min.js"></script>
 	<script src="js/mustache.js"></script>
+	<script type="text/javascript" src="http://maps.google.com/maps/api/js?v=3&sensor=true&language=pl"></script>
+	<script src="js/gmap3.js"></script>
+		
 	<!-- <script src="http://localhost:3000/socket.io/socket.io.js"></script> -->
 	<script src="http://oskhelper.eu01.aws.af.cm/socket.io/socket.io.js"></script>
 	<script src="js/main.js"></script>
@@ -112,20 +116,11 @@
 
 
 	<div data-role="page" id="place-details" data-theme='b'>
-		<header data-role="header" data-tap-toggle="false" data-theme='b'>
-			<h1>
-				<a href="#"><i class='icon-road'></i></a>
-				Wybrany plac
-			</h1>
-		</header>
-
+		
 		<section id="placeDetailsContent" data-role="content">
 			
 		</section>
 
-		<footer data-role="footer" class="footer">
-			<h4>&copy; 2012 - 2013 Sebastian Troć</h4>
-		</footer>
 	</div><!-- /#place-details -->
 
 
@@ -169,10 +164,11 @@
 		</header>
 
 		<section data-role="content">
+			<br>
 			<div class="inset">
 				<h2>Aktualizacja</h2>
 
-				hr
+				<hr>
 				<h2>Wyloguj</h2>
 			</div>
 		</section>
@@ -193,7 +189,7 @@
 
 	<script id="placesListElemTmpl" type="text/template">
 		<li class="place">
-			<a href="#" data-place="{{_id}}" data-coords="12, 34" id="place_{{_id}}" class="occupyPlaceTrigger">
+			<a href="#" data-place="{{_id}}" data-lat="{{coordinates.lat}}" data-lng="{{coordinates.lng}}" id="place_{{_id}}" class="occupyPlaceTrigger">
 				<img src="assets/{{photo}}" alt="{{name}}" />
 				<h2 class="place-name">{{name}}</h2>
 				<p class="address">{{address}}</p>
@@ -203,13 +199,19 @@
 	</script>
 
 	<script id="placesDetailsElemTmpl" type="text/template">
-		<div class="inset">
+		<header data-role="header" data-tap-toggle="false" data-theme='b'>
+			<h1>
+				{{thatPlaceName}}
+			</h1>
+		</header>
+		<div>
 			<h2>
 				Zajmujesz teraz plac <strong class="place-name">{{thatPlaceName}}</strong><br>
 			</h2>
 			pod adresem: <strong class="address">{{thatPlaceAddress}}</strong> <br>
-			o współrzędnych: <strong class="coordinates"></strong>
+			o współrzędnych: <strong class="coordinates">{{thatPlaceCoords.lat}}, {{thatPlaceCoords.lng}}</strong>
 			<hr>
+			<div id="map" style="width:100%;height:350px"></div>
 			<a href="#" id="releasePlace" data-place="{{thatPlaceID}}">Zwolnij plac</a>
 		</div>
 	</script>
