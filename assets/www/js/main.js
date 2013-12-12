@@ -5,33 +5,33 @@ window.placeListItems;
 
 var OSK_Helper = {
 
-	init: function() {
+  init: function() {
     $.mobile.changePage("#splashscreen");
-		OSK_Helper.checkPreAuth();
-	},
+    OSK_Helper.checkPreAuth();
+  },
 
-	serverAddress: 'http://oskhelper.eu01.aws.af.cm',
+  serverAddress: 'http://oskhelper.eu01.aws.af.cm',
   // serverAddress: 'http://localhost:3000',
-	// serverAddress: 'http://192.168.56.1:3000',
+  // serverAddress: 'http://192.168.56.1:3000',
 
   // save downloaded places to HTML5 WebStorage
-	prepareDatabase_Places: function(data) {
-		var self = this
+  prepareDatabase_Places: function(data) {
+    var self = this
     ,   freePlaces = 0; // free places counter
-	  this.db = openDatabase("oskhelperdb", "1.0", "Place manewrowe", 5*1024*1024);
-	  this.db.transaction(function(tx){
-  		tx.executeSql('DROP TABLE IF EXISTS places');
+    this.db = openDatabase("oskhelperdb", "1.0", "Place manewrowe", 5*1024*1024);
+    this.db.transaction(function(tx){
+      tx.executeSql('DROP TABLE IF EXISTS places');
       tx.executeSql('CREATE TABLE IF NOT EXISTS places (id unique, address, name, photo, occupated, coordinates)');
       $.each(data.places, function(index, elem){
         tx.executeSql('INSERT INTO places (id, address, name, photo, occupated, coordinates) VALUES ("'+ elem._id + '", "' + elem.address + '", "' + elem.name + '", "'  + elem.photo + '", "' + elem.occupated + '", "' + elem.coordinates.lat + ',' + elem.coordinates.lng + '")');
         OSK_Helper.renderPlacesList(elem); // render place list item
         freePlaces++; // increment free places count
       });
-	  },
-	  function(err) { // callback if error
-			console.log(err);
-		},
-		function() { // callback if success
+    },
+    function(err) { // callback if error
+      console.log(err);
+    },
+    function() { // callback if success
       OSK_Helper.clickPlaceHandle();
 
       var placesListHeader = '<li data-role="list-divider">Place manewrowe <span id="places-counter" class="ui-li-count">Wolnych: '+ freePlaces +'</span></li>'
@@ -41,25 +41,25 @@ var OSK_Helper = {
       OSK_Helper.deviceGeolocation();
       $('#places-list').listview('refresh');
     });
-	},
+  },
 
   // downloads places list from API
-	getPlacesFromAPI: function() {
-		// JSONP for Cross Domain JSON transfer
-		var placesJSON;
-		$.getJSON(this.serverAddress + '/api/places?callback=?', function(data){
-			placesJSON = data;
-			OSK_Helper.prepareDatabase_Places(placesJSON);
-		});
-	},
+  getPlacesFromAPI: function() {
+    // JSONP for Cross Domain JSON transfer
+    var placesJSON;
+    $.getJSON(this.serverAddress + '/api/places?callback=?', function(data){
+      placesJSON = data;
+      OSK_Helper.prepareDatabase_Places(placesJSON);
+    });
+  },
 
   // Renders places list based on JSON from API
-	renderPlacesList: function(jsonData) {
-		var template = $('#placesListElemTmpl').html();
-		var html = Mustache.to_html(template, jsonData);
-		$('#places-list').append(html);
+  renderPlacesList: function(jsonData) {
+    var template = $('#placesListElemTmpl').html();
+    var html = Mustache.to_html(template, jsonData);
+    $('#places-list').append(html);
     window.placeListItems = $('#places-list').find('li');
-	},
+  },
 
   // Renders place's details on click at places list element
   renderDetailsTemplate: function(data) {
@@ -87,8 +87,8 @@ var OSK_Helper = {
   },
 
   // Signing in handlers
-	postLogin: function(u,p) {
-		$.ajax({
+  postLogin: function(u,p) {
+    $.ajax({
       url : OSK_Helper.serverAddress + "/api/login",
       type : "get",
       dataType : "jsonp",
@@ -104,11 +104,11 @@ var OSK_Helper = {
       error : function(result) {
         alert("Coś się nie zgadza. Spróbuj ponownie.");
         alert(result);
-      	$("#submitButton").removeAttr("disabled");
-      	// navigator.notification.alert("Coś się nie zgadza. Spróbuj ponownie.", function() {});
+        $("#submitButton").removeAttr("disabled");
+        // navigator.notification.alert("Coś się nie zgadza. Spróbuj ponownie.", function() {});
       }
-  	});
-	},
+    });
+  },
 
   // Signing in success callback
   onSuccessLogin: function() {
@@ -119,16 +119,16 @@ var OSK_Helper = {
   },
 
 
-	logInAPI: function() {
-		var form = $("#loginForm");
+  logInAPI: function() {
+    var form = $("#loginForm");
     //disable the button so we can't resubmit while we wait
     $("#submitButton",form).attr("disabled","disabled");
     var u = $("#username", form).val();
     var p = $("#password", form).val();
     if(u != '' && p!= '') {
-			OSK_Helper.postLogin(u,p);
+      OSK_Helper.postLogin(u,p);
     } else {
-  		alert("Proszę wprowadzić poprawne dane logowania...");
+      alert("Proszę wprowadzić poprawne dane logowania...");
       // navigator.notification.alert("Proszę wprowadzić poprawne dane logowania...", function() {});
       $("#submitButton").removeAttr("disabled");
     }
@@ -138,10 +138,10 @@ var OSK_Helper = {
 
   // Auto login if found credentials in WebStorage
   checkPreAuth: function() {
-  	$("#submitButton",form).click(OSK_Helper.logInAPI);
+    $("#submitButton",form).click(OSK_Helper.logInAPI);
     var form = $("#loginForm");
     if(window.localStorage["username"] != undefined && window.localStorage["password"] != undefined) {
-    	console.log('checkPreAuth: logged in');
+      console.log('checkPreAuth: logged in');
       $("#username", form).val(window.localStorage["username"]);
       $("#password", form).val(window.localStorage["password"]);
       $("#submitButton",form).click();
@@ -149,7 +149,7 @@ var OSK_Helper = {
       console.log('checkPreAuth: logged out');
       $.mobile.changePage("#login");
     }
-	},
+  },
 
 
   // Interval for update geolocation
@@ -195,7 +195,7 @@ var OSK_Helper = {
 
     jQuery.each(places, function(index, elem) {
       var el            = $(elem)
-      ,   distanceMeter = el.find('.distance strong')
+      ,   distanceMeter = el.find('.distance')
       ,   placeCoords   = el.find('a').data('coords')
       ,   newDistance   = 'undefined';
       
@@ -214,14 +214,18 @@ var OSK_Helper = {
                 for(var j=0; j<elements.length; j++){
                   switch(elements[j].status){
                     case "OK":
-                    console.log(elements[j]);
-                      newDistance = elements[j].distance.text + " (" + elements[j].duration.text + ")<br />";
+                      //console.log(elements[j]);
+                      var distanceVal = elements[j].distance.value;
+                      newDistance = (distanceVal >= 1000) ? "<strong>"+ parseFloat(distanceVal/1000).toFixed(2) +"</strong> km" : "<strong>"+ distanceVal +"</strong> m";
+
                       el.data('distance', elements[j].distance.text);
                       el.data('duration', elements[j].duration.text);
                       break;
+
                     case "NOT_FOUND":
                       console.log('The origin and/or destination of this pairing could not be geocoded<br />');
                       break;
+
                     case "ZERO_RESULTS":
                       console.log('No route could be found between the origin and destination.<br />');
                       break;
