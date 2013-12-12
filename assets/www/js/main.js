@@ -1,5 +1,7 @@
 window.loggedInAPI = false;
 window.socket = {};
+window.deviceLocation;
+window.placeListItems;
 
 var OSK_Helper = {
 
@@ -8,8 +10,9 @@ var OSK_Helper = {
 		OSK_Helper.checkPreAuth();
 	},
 
-	// serverAddress: 'http://oskhelper.eu01.aws.af.cm',
-	serverAddress: 'http://localhost:3000',
+	serverAddress: 'http://oskhelper.eu01.aws.af.cm',
+  // serverAddress: 'http://localhost:3000',
+	// serverAddress: 'http://192.168.56.1:3000',
 
   // save downloaded places to HTML5 WebStorage
 	prepareDatabase_Places: function(data) {
@@ -35,6 +38,7 @@ var OSK_Helper = {
       $('#places-list').prepend(placesListHeader);
       
       $.mobile.changePage("#places");
+      OSK_Helper.deviceGeolocation();
       $('#places-list').listview('refresh');
     });
 	},
@@ -54,6 +58,7 @@ var OSK_Helper = {
 		var template = $('#placesListElemTmpl').html();
 		var html = Mustache.to_html(template, jsonData);
 		$('#places-list').append(html);
+    window.placeListItems = $('#places-list').find('li');
 	},
 
   // Renders place's details on click at places list element
@@ -147,10 +152,65 @@ var OSK_Helper = {
 	},
 
 
+  // Interval for update geolocation
+  deviceGeolocation: function() {
+
+    var onSuccess = function(position) {
+      /* for debugging
+      alert('Latitude: '          + position.coords.latitude          + '\n' +
+            'Longitude: '         + position.coords.longitude         + '\n' +
+            'Altitude: '          + position.coords.altitude          + '\n' +
+            'Accuracy: '          + position.coords.accuracy          + '\n' +
+            'Altitude Accuracy: ' + position.coords.altitudeAccuracy  + '\n' +
+            'Heading: '           + position.coords.heading           + '\n' +
+            'Speed: '             + position.coords.speed             + '\n' +
+            'Timestamp: '         + position.timestamp                + '\n');
+      */
+      window.deviceLocation = {
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude
+      }
+
+      OSK_Helper.updateDistances();
+    };
+
+    var onError = function(error) {
+      alert('Nie udało ustalić położenia GPS: '    + error.code    + '\n' +
+            'error code: '    + error.code    + '\n' +
+            'message: ' + error.message + '\n');
+    }
+    
+    navigator.geolocation.getCurrentPosition(onSuccess, onError);
+    var watchID = navigator.geolocation.watchPosition(onSuccess, onError, { 
+      enableHighAccuracy: true,
+      timeout: 30000,
+      maximumAge: 0
+    });
+
+  },
+
+
+  updateDistances: function() {
+    var places = window.placeListItems;
+
+    jQuery.each(places, function(index, elem) {
+      var distanceMeter = $(elem).find('.distance strong')
+      ,   placeCoords   = $(elem).find('a').data('coords')
+      ,   newDistance   = geolib.getDistance(window.deviceLocation, placeCoords);
+
+      distanceMeter.text(newDistance);
+    });
+
+  },
+
+
   // Establishing Socket.io connection and configure socket's events
   openWebSocket: function() {
-    window.socket = io.connect('localhost', {
-      port: 3000
+    // window.socket = io.connect('localhost', {
+    // window.socket = io.connect('192.168.56.1', {
+    window.socket = io.connect('oskhelper.eu01.aws.af.cm', {
+      port: 80
+      // port: 3000
     });
     // window.socket = io.connect('oskhelper.eu01.aws.af.cm', {
     //   port: 80
@@ -206,10 +266,7 @@ var OSK_Helper = {
 
       var that = $(this)
        ,  thatID = that.data('place')
-       ,  thatCoords = {
-          lat: that.data('lat'),
-          lng: that.data('lng')
-       }
+       ,  thatPlaceCoords = that.data('coords')
        ,  thatContainer = that.closest('li');
        //console.log(thatContainer);
 
@@ -221,7 +278,7 @@ var OSK_Helper = {
         var data = {
           thatPlaceID: thatID,
           thatPlaceName: that.find('.place-name').text(),
-          thatPlaceCoords: thatCoords,
+          thatPlaceCoords: thatPlaceCoords,
           thatPlaceAddress: that.find('.address').text()
         };
 

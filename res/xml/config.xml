@@ -24,6 +24,9 @@
      -->
 
     <access origin="http://127.0.0.1*"/> <!-- allow local pages -->
+    <access origin="http://localhost*"/> <!-- allow local pages -->
+    <access origin="http://192.168.56.1*"/> <!-- allow local pages from virtualbox hosts in android emulator -->
+    <access origin="http://google.com" /> <!-- allow maps api -->
 
     <!-- <access origin="https://example.com" /> allow any secure requests to example.com -->
     <!-- <access origin="https://example.com" subdomains="true" /> such as above, but including subdomains, such as www -->
