@@ -167,8 +167,8 @@ var OSK_Helper = {
             'Timestamp: '         + position.timestamp                + '\n');
       */
       window.deviceLocation = {
-        latitude: position.coords.latitude,
-        longitude: position.coords.longitude
+        lat: position.coords.latitude,
+        lng: position.coords.longitude
       }
 
       OSK_Helper.updateDistances();
@@ -194,11 +194,48 @@ var OSK_Helper = {
     var places = window.placeListItems;
 
     jQuery.each(places, function(index, elem) {
-      var distanceMeter = $(elem).find('.distance strong')
-      ,   placeCoords   = $(elem).find('a').data('coords')
-      ,   newDistance   = geolib.getDistance(window.deviceLocation, placeCoords);
+      var el            = $(elem)
+      ,   distanceMeter = el.find('.distance strong')
+      ,   placeCoords   = el.find('a').data('coords')
+      ,   newDistance   = 'undefined';
+      
+      el.gmap3({
+        getdistance:{
+          options:{ 
+            origins: [window.deviceLocation], 
+            destinations: [placeCoords],
+            travelMode: google.maps.TravelMode.DRIVING
+          },
+          callback: function(results, status){
+            var newDistance = "";
+            if (results){
+              for (var i = 0; i < results.rows.length; i++){
+                var elements = results.rows[i].elements;
+                for(var j=0; j<elements.length; j++){
+                  switch(elements[j].status){
+                    case "OK":
+                    console.log(elements[j]);
+                      newDistance = elements[j].distance.text + " (" + elements[j].duration.text + ")<br />";
+                      el.data('distance', elements[j].distance.text);
+                      el.data('duration', elements[j].duration.text);
+                      break;
+                    case "NOT_FOUND":
+                      console.log('The origin and/or destination of this pairing could not be geocoded<br />');
+                      break;
+                    case "ZERO_RESULTS":
+                      console.log('No route could be found between the origin and destination.<br />');
+                      break;
+                  }
+                }
+              } 
+            } else {
+              alert('Problem z połączeniem GPS');
+            }
+            distanceMeter.html(newDistance);
+          }
+        }
+      });
 
-      distanceMeter.text(newDistance);
     });
 
   },

@@ -190,11 +190,11 @@
 
 	<script id="placesListElemTmpl" type="text/template">
 		<li class="place">
-			<a href="#" data-place="{{_id}}" data-coords='{ "latitude":"{{coordinates.lat}}", "longitude": "{{coordinates.lng}}" }' id="place_{{_id}}" class="occupyPlaceTrigger">
+			<a href="#" data-place="{{_id}}" data-coords='{ "lat":"{{coordinates.lat}}", "lng": "{{coordinates.lng}}" }' id="place_{{_id}}" class="occupyPlaceTrigger">
 				<img src="assets/{{photo}}" alt="{{name}}" />
 				<h2 class="place-name">{{name}}</h2>
 				<p class="address">{{address}}</p>
-				<p class="distance ui-li-aside"><strong>10</strong> m</p>
+				<p class="distance ui-li-aside"><strong></strong></p>
 			</a>
 		</li>
 	</script>
