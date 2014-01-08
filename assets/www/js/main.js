@@ -10,9 +10,7 @@ var OSK_Helper = {
     OSK_Helper.checkPreAuth();
   },
 
-  serverAddress: 'http://oskhelper.eu01.aws.af.cm',
-  // serverAddress: 'http://localhost:3000',
-  // serverAddress: 'http://192.168.56.1:3000',
+  serverAddress: 'http://' + AppConfig.api_server.host + ':' + AppConfig.api_server.port,
 
   // save downloaded places to HTML5 WebStorage
   prepareDatabase_Places: function(data) {
@@ -73,16 +71,25 @@ var OSK_Helper = {
     var map_container = destinationElem.find('#map');
     var placeCenter = [data.thatPlaceCoords.lat, data.thatPlaceCoords.lng];
 
-    map_container.gmap3({
-      map: {
-        options: {
-          center: placeCenter,
+    this.renderMap(map_container, placeCenter);
+  },
+
+
+  renderMap: function(map_container, coords) {
+  console.log(coords[0], coords[1]);
+    var center = new google.maps.LatLng(coords[0], coords[1]);
+    var mapOptions = {
+          center: center,
           zoom: 16
-        }
-      },
-      marker: {
-        latLng: placeCenter
-      }
+        };
+    var map = new google.maps.Map(map_container[0], mapOptions);
+    var marker = new google.maps.Marker({
+      position: center,
+      map: map
+    });
+    $('#place-details').on('pageshow', function() {
+      google.maps.event.trigger(map, 'resize');
+      map.setOptions({ center: center });
     });
   },
 
@@ -156,16 +163,6 @@ var OSK_Helper = {
   deviceGeolocation: function() {
 
     var onSuccess = function(position) {
-      /* for debugging
-      alert('Latitude: '          + position.coords.latitude          + '\n' +
-            'Longitude: '         + position.coords.longitude         + '\n' +
-            'Altitude: '          + position.coords.altitude          + '\n' +
-            'Accuracy: '          + position.coords.accuracy          + '\n' +
-            'Altitude Accuracy: ' + position.coords.altitudeAccuracy  + '\n' +
-            'Heading: '           + position.coords.heading           + '\n' +
-            'Speed: '             + position.coords.speed             + '\n' +
-            'Timestamp: '         + position.timestamp                + '\n');
-      */
       window.deviceLocation = {
         lat: position.coords.latitude,
         lng: position.coords.longitude
@@ -247,15 +244,12 @@ var OSK_Helper = {
 
   // Establishing Socket.io connection and configure socket's events
   openWebSocket: function() {
-    // window.socket = io.connect('localhost', {
-    // window.socket = io.connect('192.168.56.1', {
-    window.socket = io.connect('oskhelper.eu01.aws.af.cm', {
-      port: 80
-      // port: 3000
+
+    'http://' + AppConfig.api_server.host + ':' + AppConfig.api_server.port
+
+    window.socket = io.connect(AppConfig.api_server.host, {
+      port: AppConfig.api_server.port
     });
-    // window.socket = io.connect('oskhelper.eu01.aws.af.cm', {
-    //   port: 80
-    // });
     var socket = window.socket;
 
     socket.on('connect',function() {
@@ -291,7 +285,7 @@ var OSK_Helper = {
 
     // var instructor = OSK_Helper.getInstructorID;
     var socket = window.socket;
-    socket.emit('placeIsOccupied', {place: placeID});
+    socket.emit('placeIsOccupied', {place: placeID, instructor: window.localStorage["instructor_id"]});
   },
 
   releasePlace: function(placeID) {
