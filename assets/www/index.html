@@ -31,7 +31,6 @@
 	<script src="js/mustache.js"></script>
 	<script type="text/javascript" src="http://maps.google.com/maps/api/js?v=3&sensor=true&language=pl"></script>
 	<script src="js/gmap3.js"></script>
-	<script src="js/geolib.min.js"></script>
 		
 	<!-- <script src="http://localhost:3000/socket.io/socket.io.js"></script> -->
 	<script src="http://oskhelper.eu01.aws.af.cm/socket.io/socket.io.js"></script>
@@ -56,7 +55,7 @@
 		</section>
 
 		<footer data-role="footer" data-position="fixed" class="footer">
-			<h4>&copy; 2012 -2013 Sebastian Troć</h4>
+			<h4>&copy; Sebastian Troć</h4>
 		</footer>
 	</div><!-- /#login-->
 
@@ -81,16 +80,13 @@
 			</div>
 		</section>
 
-		<footer data-role="footer" data-position="fixed" class="footer">
-			<h4>&copy; 2012 -2013 Sebastian Troć</h4>
-		</footer>
 	</div><!-- /#login-->
 
 
 
 	<div data-role="page" id="places" data-theme='b'>
 
-		<header data-role="header" data-tap-toggle="false" data-theme='b'>
+		<header data-role="header" data-tap-toggle="false" data-theme='b' data-id="main-header">
 			<h1>
 				<a href="#"><i class='icon-dashboard'></i></a>
 				OSK Helper
@@ -105,7 +101,7 @@
 		<div data-position="fixed" data-tap-toggle="false" data-role="footer" data-tap-toggle="false" data-theme='b'>
 			<div data-role="navbar">
 				<ul>
-					<li><a href="#" class="ui-btn-active" data-icon="map-marker">Place</a></li>
+					<li><a href="#" class="active" data-icon="map-marker">Place</a></li>
 					<li><a href="#instructors" data-icon="user">Instruktorzy</a></li>
 					<li><a href="#settings" data-icon="cogs">Ustawienia</a></li>
 				</ul>
@@ -128,7 +124,7 @@
 
 	<div data-role="page" id="instructors" data-theme='b'>
 
-		<header data-role="header" data-tap-toggle="false" data-theme='b'>
+		<header data-role="header" data-tap-toggle="false" data-theme='b' data-id="main-header">
 			<h1>
 				<a href="#"><i class='icon-dashboard'></i></a>
 				OSK Helper
@@ -145,7 +141,7 @@
 			<div data-role="navbar">
 				<ul>
 					<li><a href="#places" data-icon="map-marker">Place</a></li>
-					<li><a href="#" class="ui-btn-active" data-icon="user">Instruktorzy</a></li>
+					<li><a href="#" class="active" data-icon="user">Instruktorzy</a></li>
 					<li><a href="#settings" data-icon="cogs">Ustawienia</a></li>
 				</ul>
 			</div>
@@ -157,9 +153,9 @@
 
 	<div data-role="page" id="settings" data-theme='b'>
 
-		<header data-role="header" data-tap-toggle="false" data-theme='b'>
+		<header data-role="header" data-tap-toggle="false" data-theme='b' data-id="main-header">
 			<h1>
-				<a href="#"><i class='icon-gear'></i></a>
+				<a href="#"><i class='icon-dashboard'></i></a>
 				OSK Helper
 			</h1>
 		</header>
@@ -179,7 +175,7 @@
 				<ul>
 					<li><a href="#places" data-icon="map-marker">Place</a></li>
 					<li><a href="#instructors" data-icon="user">Instruktorzy</a></li>
-					<li><a href="#" class="ui-btn-active" data-icon="cogs">Ustawienia</a></li>
+					<li><a href="#" class="active" data-icon="cogs">Ustawienia</a></li>
 				</ul>
 			</div>
 		</div>
