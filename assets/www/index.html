@@ -75,7 +75,7 @@
 				<form id="loginForm" action="" method="post">
 	        <input type="text" name="username" id="username" value="" placeholder="Login" />
 	        <input type="password" name="password" id="password" value="" placeholder="Hasło" />
-					<button type="submit" name="login" id="submitButton" data-theme="b">Zaloguj</button>
+					<button type="submit" name="login" id="loginButton" data-theme="b">Zaloguj</button>
 				</form>
 			</div>
 		</section>
@@ -160,14 +160,8 @@
 			</h1>
 		</header>
 
-		<section data-role="content">
-			<br>
-			<div class="inset">
-				<h2>Aktualizacja</h2>
+		<section data-role="content" id="settings-view">
 
-				<hr>
-				<h2>Wyloguj</h2>
-			</div>
 		</section>
 
 		<div data-position="fixed" data-tap-toggle="false" data-role="footer" data-tap-toggle="false" data-theme='b'>
@@ -201,7 +195,7 @@
 				{{thatPlaceName}}
 			</h1>
 		</header>
-		<div>
+		<div data-role="content">
 			<h2>
 				Zajmujesz teraz plac <strong class="place-name">{{thatPlaceName}}</strong><br>
 			</h2>
@@ -209,7 +203,26 @@
 			o współrzędnych: <strong class="coordinates">{{thatPlaceCoords.lat}}, {{thatPlaceCoords.lng}}</strong>
 			<hr>
 			<div id="map" style="width:100%;height:350px"></div>
-			<a href="#" id="releasePlace" data-place="{{thatPlaceID}}">Zwolnij plac</a>
+			<form action="">
+				<fieldset>
+					<a data-role="button" href="#" id="releasePlace" data-place="{{thatPlaceID}}" data-theme="b">Zwolnij plac</a>
+				</fieldset>
+			</form>
+		</div>
+	</script>
+
+	<script id="settingsTmpl" type="text/template">
+		<br>
+		<div class="inset">
+			<h2>Aktualizacja</h2>
+
+			<hr>
+			<h2>Zalogowany jako: <small>{{loggedUserName}}</small></h2>
+			<form action="">
+				<fieldset>
+					<button data-role="button" type="submit" id="logout" data-theme="b">Wyloguj</button>
+				</fieldset>
+			</form>
 		</div>
 	</script>
 

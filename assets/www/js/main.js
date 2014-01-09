@@ -16,13 +16,15 @@ var OSK_Helper = {
   prepareDatabase_Places: function(data) {
     var self = this
     ,   freePlaces = 0; // free places counter
+
+
     this.db = openDatabase("oskhelperdb", "1.0", "Place manewrowe", 5*1024*1024);
     this.db.transaction(function(tx){
       tx.executeSql('DROP TABLE IF EXISTS places');
       tx.executeSql('CREATE TABLE IF NOT EXISTS places (id unique, address, name, photo, occupated, coordinates)');
       $.each(data.places, function(index, elem){
         tx.executeSql('INSERT INTO places (id, address, name, photo, occupated, coordinates) VALUES ("'+ elem._id + '", "' + elem.address + '", "' + elem.name + '", "'  + elem.photo + '", "' + elem.occupated + '", "' + elem.coordinates.lat + ',' + elem.coordinates.lng + '")');
-        OSK_Helper.renderPlacesList(elem); // render place list item
+        OSK_Helper.renderPlacesListElem(elem); // render place list item
         freePlaces++; // increment free places count
       });
     },
@@ -45,6 +47,9 @@ var OSK_Helper = {
   getPlacesFromAPI: function() {
     // JSONP for Cross Domain JSON transfer
     var placesJSON;
+    
+    $('#places-list').empty();
+    
     $.getJSON(this.serverAddress + '/api/places?callback=?', function(data){
       placesJSON = data;
       OSK_Helper.prepareDatabase_Places(placesJSON);
@@ -52,7 +57,7 @@ var OSK_Helper = {
   },
 
   // Renders places list based on JSON from API
-  renderPlacesList: function(jsonData) {
+  renderPlacesListElem: function(jsonData) {
     var template = $('#placesListElemTmpl').html();
     var html = Mustache.to_html(template, jsonData);
     $('#places-list').append(html);
@@ -76,7 +81,6 @@ var OSK_Helper = {
 
 
   renderMap: function(map_container, coords) {
-  console.log(coords[0], coords[1]);
     var center = new google.maps.LatLng(coords[0], coords[1]);
     var mapOptions = {
           center: center,
@@ -106,12 +110,13 @@ var OSK_Helper = {
         window.localStorage["username"] = u;
         window.localStorage["password"] = p;
         window.localStorage["instructor_id"] = result.instructor_id;
+        window.localStorage["instructor_name"] = result.instructor_name;
         OSK_Helper.onSuccessLogin();
       },
       error : function(result) {
         alert("Coś się nie zgadza. Spróbuj ponownie.");
         alert(result);
-        $("#submitButton").removeAttr("disabled");
+        $("#loginButton").removeAttr("disabled");
         // navigator.notification.alert("Coś się nie zgadza. Spróbuj ponownie.", function() {});
       }
     });
@@ -122,6 +127,7 @@ var OSK_Helper = {
     window.loggedInAPI = true;
     OSK_Helper.getPlacesFromAPI();
     OSK_Helper.openWebSocket();
+    OSK_Helper.renderSettingsView();
     //$.mobile.changePage("#places");
   },
 
@@ -129,7 +135,7 @@ var OSK_Helper = {
   logInAPI: function() {
     var form = $("#loginForm");
     //disable the button so we can't resubmit while we wait
-    $("#submitButton",form).attr("disabled","disabled");
+    $("#loginButton",form).attr("disabled","disabled");
     var u = $("#username", form).val();
     var p = $("#password", form).val();
     if(u != '' && p!= '') {
@@ -137,7 +143,7 @@ var OSK_Helper = {
     } else {
       alert("Proszę wprowadzić poprawne dane logowania...");
       // navigator.notification.alert("Proszę wprowadzić poprawne dane logowania...", function() {});
-      $("#submitButton").removeAttr("disabled");
+      $("#loginButton").removeAttr("disabled");
     }
     return false;
   },
@@ -145,17 +151,37 @@ var OSK_Helper = {
 
   // Auto login if found credentials in WebStorage
   checkPreAuth: function() {
-    $("#submitButton",form).click(OSK_Helper.logInAPI);
+    $("#loginButton",form).on('click', OSK_Helper.logInAPI);
     var form = $("#loginForm");
     if(window.localStorage["username"] != undefined && window.localStorage["password"] != undefined) {
       console.log('checkPreAuth: logged in');
       $("#username", form).val(window.localStorage["username"]);
       $("#password", form).val(window.localStorage["password"]);
-      $("#submitButton",form).click();
+      $("#loginButton",form).click();
     } else {
       console.log('checkPreAuth: logged out');
       $.mobile.changePage("#login");
     }
+  },
+
+
+  renderSettingsView: function() {
+    var template = $('#settingsTmpl').html();
+    var html = Mustache.to_html(template, {
+      loggedUserName: window.localStorage["instructor_name"]
+    }); 
+    $('#settings-view').append(html);
+
+    $('#logout').on('click', OSK_Helper.logout);
+  },
+
+
+  logout: function() {
+    window.localStorage.clear();
+    $('#settings-view').empty();
+    $("#loginButton").removeAttr("disabled");
+    console.log('logged out');
+    $.mobile.changePage("#login");
   },
 
 
