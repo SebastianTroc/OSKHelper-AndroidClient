@@ -181,7 +181,7 @@
 	<script id="placesListElemTmpl" type="text/template">
 		<li class="place">
 			<a href="#" data-place="{{_id}}" data-coords='{ "lat":"{{coordinates.lat}}", "lng": "{{coordinates.lng}}" }' id="place_{{_id}}" class="occupyPlaceTrigger">
-				<img src="assets/{{photo}}" alt="{{name}}" />
+				<img src="{{photoBase64}}" alt="{{name}}" />
 				<h2 class="place-name">{{name}}</h2>
 				<p class="address">{{address}}</p>
 				<p class="distance ui-li-aside"></p>
@@ -192,17 +192,15 @@
 	<script id="placesDetailsElemTmpl" type="text/template">
 		<header data-role="header" data-tap-toggle="false" data-theme='b'>
 			<h1>
-				{{thatPlaceName}}
+				<strong class="place-name">{{thatPlaceName}}</strong><br>
 			</h1>
 		</header>
 		<div data-role="content">
 			<h2>
-				Zajmujesz teraz plac <strong class="place-name">{{thatPlaceName}}</strong><br>
 			</h2>
 			pod adresem: <strong class="address">{{thatPlaceAddress}}</strong> <br>
-			o współrzędnych: <strong class="coordinates">{{thatPlaceCoords.lat}}, {{thatPlaceCoords.lng}}</strong>
 			<hr>
-			<div id="map" style="width:100%;height:350px"></div>
+			<div id="map" style="width:100%;height:250px"></div>
 			<form action="">
 				<fieldset>
 					<a data-role="button" href="#" id="releasePlace" data-place="{{thatPlaceID}}" data-theme="b">Zwolnij plac</a>
