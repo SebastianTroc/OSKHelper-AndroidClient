@@ -217,10 +217,10 @@ var OSK_Helper = {
     var places = window.placeListItems;
 
     jQuery.each(places, function(index, elem) {
-      var el            = $(elem)
-      ,   distanceMeter = el.find('.distance')
-      ,   placeCoords   = el.find('a').data('coords')
-      ,   newDistance   = 'undefined';
+      var el              = $(elem)
+      ,   distanceMeter   = el.find('.distance')
+      ,   placeCoords     = el.find('a').data('coords')
+      ,   newDistance     = 'undefined';
       
       el.gmap3({
         getdistance:{
@@ -237,12 +237,16 @@ var OSK_Helper = {
                 for(var j=0; j<elements.length; j++){
                   switch(elements[j].status){
                     case "OK":
-                      //console.log(elements[j]);
-                      var distanceVal = elements[j].distance.value;
+                      var distanceVal     = elements[j].distance.value
+                      ,   durationString  = elements[j].duration.text;
+                      newDistanceNum = distanceVal;
                       newDistance = (distanceVal >= 1000) ? "<strong>"+ parseFloat(distanceVal/1000).toFixed(2) +"</strong> km" : "<strong>"+ distanceVal +"</strong> m";
 
-                      el.data('distance', elements[j].distance.text);
-                      el.data('duration', elements[j].duration.text);
+                      el.attr('data-distance', distanceVal);
+                      el.attr('data-duration', durationString);
+
+                      distanceMeter.html(newDistance);
+                      console.log(el.data('distance'));
                       break;
 
                     case "NOT_FOUND":
@@ -258,13 +262,12 @@ var OSK_Helper = {
             } else {
               alert('Problem z połączeniem GPS');
             }
-            distanceMeter.html(newDistance);
           }
         }
       });
 
     });
-
+    places.tsort({attr: 'data-distance'}); // sorting elements by distance
   },
 
 
