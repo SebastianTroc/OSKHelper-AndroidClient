@@ -1,1 +1,1 @@
-"# Jakies tam nie dorobione README" 
+"# Jakies tam niedorobione README" 
