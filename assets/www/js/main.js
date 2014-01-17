@@ -2,6 +2,7 @@ window.loggedInAPI = false;
 window.socket = {};
 window.deviceLocation;
 window.placeListItems;
+window.instructorsListItems;
 
 var OSK_Helper = {
 
@@ -16,7 +17,6 @@ var OSK_Helper = {
   prepareDatabase_Places: function(data) {
     var self = this
     ,   freePlaces = 0; // free places counter
-
 
     this.db = openDatabase("oskhelperdb", "1.0", "Place manewrowe", 5*1024*1024);
     this.db.transaction(function(tx){
@@ -65,7 +65,7 @@ var OSK_Helper = {
   },
 
   // Renders place's details on click at places list element
-  renderDetailsTemplate: function(data) {
+  renderPlaceDetailsTemplate: function(data) {
     var template = $('#placesDetailsElemTmpl').html()
      ,  html = Mustache.to_html(template, data)
      ,  destinationElem = $('#placeDetailsContent');
@@ -77,6 +77,63 @@ var OSK_Helper = {
     var placeCenter = [data.thatPlaceCoords.lat, data.thatPlaceCoords.lng];
 
     this.renderMap(map_container, placeCenter);
+  },
+
+
+  // save downloaded instructors to HTML5 WebStorage
+  prepareDatabase_Instructors: function(data) {
+    var self = this;
+
+    this.db = openDatabase("oskhelperdb", "1.0", "Place manewrowe", 5*1024*1024);
+    this.db.transaction(function(tx){
+      tx.executeSql('DROP TABLE IF EXISTS instructors');
+      tx.executeSql('CREATE TABLE IF NOT EXISTS instructors (id unique, name, phone, email)');
+      $.each(data.instructors, function(index, elem){
+        tx.executeSql('INSERT INTO instructors (id, name, phone, email) VALUES ("'+ elem._id + '", "' + elem.name + '", "' + elem.phone + '", "'  + elem.email + '")');
+        OSK_Helper.renderInstructorsListElem(elem); // render place list item
+      });
+    },
+    function(err) { // callback if error
+      console.log(err);
+    },
+    function() { // callback if success
+      OSK_Helper.clickInstructorHandle();
+
+      var instructorsListHeader = '<li data-role="list-divider">Instruktorzy</li>'
+      $('#instructors-list').prepend(instructorsListHeader);
+      $('#instructors-list').listview('refresh');
+    });
+  },
+
+  // downloads instructors list from API
+  getInstructorsFromAPI: function() {
+    // JSONP for Cross Domain JSON transfer
+    var instructorsJSON;
+    
+    $('#instructors-list').empty();
+    
+    $.getJSON(this.serverAddress + '/api/instructors?callback=?', function(data){
+      instructorsJSON = data;
+      OSK_Helper.prepareDatabase_Instructors(instructorsJSON);
+    });
+  },
+
+  // Renders instructors list based on JSON from API
+  renderInstructorsListElem: function(jsonData) {
+    var template = $('#instructorsListElemTmpl').html();
+    var html = Mustache.to_html(template, jsonData);
+    $('#instructors-list').append(html);
+    window.instructorsListItems = $('#instructors-list').find('li');
+  },
+
+  // Renders place's details on click at places list element
+  renderInstructorDetailsTemplate: function(data) {
+    var template = $('#instructorsDetailsElemTmpl').html()
+     ,  html = Mustache.to_html(template, data)
+     ,  destinationElem = $('#instructorDetailsContent');
+
+    destinationElem.html(html);
+    $('#instructor-details').page('destroy').page();
   },
 
 
@@ -127,6 +184,7 @@ var OSK_Helper = {
     window.loggedInAPI = true;
     OSK_Helper.getPlacesFromAPI();
     OSK_Helper.openWebSocket();
+    OSK_Helper.getInstructorsFromAPI();
     OSK_Helper.renderSettingsView();
     //$.mobile.changePage("#places");
   },
@@ -246,7 +304,6 @@ var OSK_Helper = {
                       el.attr('data-duration', durationString);
 
                       distanceMeter.html(newDistance);
-                      console.log(el.data('distance'));
                       break;
 
                     case "NOT_FOUND":
@@ -348,7 +405,7 @@ var OSK_Helper = {
 
         OSK_Helper.occupyPlace(thatID);
         console.log(data);
-        OSK_Helper.renderDetailsTemplate(data);
+        OSK_Helper.renderPlaceDetailsTemplate(data);
         OSK_Helper.clickReturnPlaces();
         $.mobile.changePage('#place-details', { role: "dialog" });
 
@@ -370,7 +427,29 @@ var OSK_Helper = {
       OSK_Helper.releasePlace(thatID);
       // $.mobile.changePage('back', { transition: "slide" });
       $.mobile.back();
-      // OSK_Helper.renderDetailsTemplate(data);
+      // OSK_Helper.renderPlaceDetailsTemplate(data);
+    })
+  },
+
+
+  clickInstructorHandle: function() {
+    $('.openInstructorDetailsTrigger').on('click', function(e){
+      e.stopPropagation();
+      e.preventDefault();
+
+      var that = $(this)
+       ,  thatID = that.data('instructor');
+
+      var data = {
+        thatInstructorID: that.data('instructor'),
+        thatInstructorName: that.data('name'),
+        thatInstructorPhone: that.data('phone'),
+        thatInstructorEmail: that.data('email')
+      };
+
+      OSK_Helper.renderInstructorDetailsTemplate(data);
+      $.mobile.changePage('#instructor-details');
+
     })
   }
 

@@ -133,7 +133,7 @@
 		</header>
 
 		<section data-role="content">
-			<ul id="instructors-list" data-role="listview" data-inset="false" data-icon="false" data-filter-placeholder='Szukaj placu...' data-filter-theme='b' data-filter="true">
+			<ul id="instructors-list" data-role="listview" data-inset="false" data-icon="false" data-filter-placeholder='Szukaj instruktora...' data-filter-theme='b' data-filter="true">
 				<li data-role="list-divider">Instruktorzy</li>
 			</ul>
 		</section>
@@ -150,6 +150,13 @@
 
 	</div><!-- /#instructors -->
 
+	<div data-role="page" id="instructor-details" data-theme='b'>
+		
+		<section id="instructorDetailsContent" data-role="content">
+			
+		</section>
+
+	</div><!-- /#place-details -->
 
 
 	<div data-role="page" id="settings" data-theme='b'>
@@ -205,6 +212,40 @@
 			<form action="">
 				<fieldset>
 					<a data-role="button" href="#" id="releasePlace" data-place="{{thatPlaceID}}" data-theme="b">Zwolnij plac</a>
+				</fieldset>
+			</form>
+		</div>
+	</script>
+
+	<script id="instructorsListElemTmpl" type="text/template">
+		<li class="instructor" data-icon="arrow-r">
+			<a href="#" data-instructor="{{_id}}" id="instructor_{{_id}}" data-name="{{name}}" data-phone="{{phone}}" data-email="{{email}}" class="openInstructorDetailsTrigger">
+				<h2 class="instructor-name">{{name}}</h2>
+			</a>
+		</li>
+	</script>
+
+	<script id="instructorsDetailsElemTmpl" type="text/template">
+		<header data-role="header" data-tap-toggle="false" data-theme='b'>
+			<h1>{{thatInstructorName}}</h1>
+		</header>
+		<div data-role="content">
+			<ul data-role="listview" data-divider-theme="b" data-icon="false" data-filter="false" data-filter-theme="b" class='showastabs'>
+        <li data-role="list-divider">Kontakt:</li>
+				<li>
+					<a href="tel:{{thatInstructorPhone}}" data-icon="phone" data-role="button" data-iconpos="right">Zadzwoń</a>
+				</li>
+				<li>
+					<a href="sms://{{thatInstructorPhone}}" data-icon="mobile-phone" data-role="button" data-iconpos="right">Napisz SMS</a>
+				</li>
+				<li>
+					<a href="mailto:{{thatInstructorEmail}}" data-icon="comment" data-role="button" data-iconpos="right">Napisz e-mail</a>
+				</li>
+      </ul>
+			<hr>
+			<form action="">
+				<fieldset>
+					<a data-role="button" href="#" data-theme="b" data-rel="back">Powrót do listy</a>
 				</fieldset>
 			</form>
 		</div>
