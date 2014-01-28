@@ -133,7 +133,6 @@ var OSK_Helper = {
      ,  destinationElem = $('#instructorDetailsContent');
 
     destinationElem.html(html);
-    $('#instructor-details').page('destroy').page();
   },
 
 
@@ -425,9 +424,7 @@ var OSK_Helper = {
       };
 
       OSK_Helper.releasePlace(thatID);
-      // $.mobile.changePage('back', { transition: "slide" });
       $.mobile.back();
-      // OSK_Helper.renderPlaceDetailsTemplate(data);
     })
   },
 
@@ -449,6 +446,8 @@ var OSK_Helper = {
 
       OSK_Helper.renderInstructorDetailsTemplate(data);
       $.mobile.changePage('#instructor-details');
+
+      $('#instructor-details').trigger('pagecreate');
 
     })
   }
