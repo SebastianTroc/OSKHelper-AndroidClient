@@ -7,11 +7,17 @@ window.instructorsListItems;
 var OSK_Helper = {
 
   init: function() {
-    $.mobile.changePage("#splashscreen");
-    OSK_Helper.checkPreAuth();
+    $.mobile.changePage('#splashscreen');  
+    if (window.localStorage['serverHost'] && window.localStorage['serverPort']) {
+      OSK_Helper.serverAddress = 'http://' + window.localStorage["serverHost"] + ':' + window.localStorage["serverPort"];
+      console.log('checkPreAuth');
+      OSK_Helper.checkPreAuth();
+    } else {
+      console.log('checkServerExists');
+      OSK_Helper.checkServerExists();
+    }
   },
 
-  serverAddress: 'http://' + AppConfig.api_server.host + ':' + AppConfig.api_server.port,
 
   // save downloaded places to HTML5 WebStorage
   prepareDatabase_Places: function(data) {
@@ -162,18 +168,18 @@ var OSK_Helper = {
       crossDomain: true,
       contentType : "application/json; charset=utf-8",
       data : {username:u,password:p},
+      error : function(result) {
+        alert("Coś się nie zgadza. Spróbuj ponownie.");
+        console.log(result);
+        $("#loginButton").removeAttr("disabled");
+        // alert("Coś się nie zgadza. Spróbuj ponownie.", function() {});
+      },
       success : function(result, textStatus, jqXHR) {
         window.localStorage["username"] = u;
         window.localStorage["password"] = p;
         window.localStorage["instructor_id"] = result.instructor_id;
         window.localStorage["instructor_name"] = result.instructor_name;
         OSK_Helper.onSuccessLogin();
-      },
-      error : function(result) {
-        alert("Coś się nie zgadza. Spróbuj ponownie.");
-        alert(result);
-        $("#loginButton").removeAttr("disabled");
-        // navigator.notification.alert("Coś się nie zgadza. Spróbuj ponownie.", function() {});
       }
     });
   },
@@ -199,7 +205,7 @@ var OSK_Helper = {
       OSK_Helper.postLogin(u,p);
     } else {
       alert("Proszę wprowadzić poprawne dane logowania...");
-      // navigator.notification.alert("Proszę wprowadzić poprawne dane logowania...", function() {});
+      // alert("Proszę wprowadzić poprawne dane logowania...", function() {});
       $("#loginButton").removeAttr("disabled");
     }
     return false;
@@ -208,8 +214,8 @@ var OSK_Helper = {
 
   // Auto login if found credentials in WebStorage
   checkPreAuth: function() {
-    $("#loginButton",form).on('click', OSK_Helper.logInAPI);
     var form = $("#loginForm");
+    $("#loginButton",form).on('click', OSK_Helper.logInAPI);
     if(window.localStorage["username"] != undefined && window.localStorage["password"] != undefined) {
       console.log('checkPreAuth: logged in');
       $("#username", form).val(window.localStorage["username"]);
@@ -219,6 +225,55 @@ var OSK_Helper = {
       console.log('checkPreAuth: logged out');
       $.mobile.changePage("#login");
     }
+  },
+
+
+  getServerHeartbeat: function(inputHost, inputPort){
+    var serverAddress = 'http://' + inputHost + ':' + inputPort;
+
+    $.ajax({
+      url : serverAddress + "/api/validate_existance",
+      type : "get",
+      dataType : "jsonp",
+      crossDomain: true,
+      contentType : "application/json; charset=utf-8",
+      error : function(result) {
+        OSK_Helper.onErrorHeartbeat(result);
+      },
+      success : function(result, textStatus, jqXHR) {
+        console.log(result);
+        if (result.exists) {
+          window.localStorage['serverHost'] = inputHost;
+          window.localStorage['serverPort'] = inputPort;
+          OSK_Helper.init();
+        } else {
+          OSK_Helper.onErrorHeartbeat(result);
+        }
+      }
+    });
+  },
+  onErrorHeartbeat: function(result){
+    console.log(result);
+    console.log('coś na nic');
+    alert('Coś się nie zgadza. Spróbuj ponownie.');
+    // Clean form fields
+    $('#host').val('');
+    $('#port').val('');
+    $("#checkServerButton").removeAttr("disabled");
+  },
+
+  // Auto login if found credentials in WebStorage
+  checkServerExists: function() {
+    $.mobile.changePage("#server-config");
+    var form = $("#serverForm");
+    $("#checkServerButton",form).on('click', function(e){
+      e.preventDefault();
+      $("#checkServerButton").attr('disabled', 'disabled');
+      var inputHost = $('#host').val();
+      var inputPort = $('#port').val() || '80';
+
+      OSK_Helper.getServerHeartbeat(inputHost, inputPort);
+    });
   },
 
 
@@ -330,7 +385,7 @@ var OSK_Helper = {
   // Establishing Socket.io connection and configure socket's events
   openWebSocket: function() {
 
-    'http://' + AppConfig.api_server.host + ':' + AppConfig.api_server.port
+    'http://' + window.localStorage['serverHost'] + ':' + window.localStorage['serverPort']
 
     window.socket = io.connect(AppConfig.api_server.host, {
       port: AppConfig.api_server.port
@@ -356,19 +411,7 @@ var OSK_Helper = {
     });
   },
 
-
-  // getInstructorID: function() {
-  //   return window.localStorage["instructor_id"];
-  // },
-
-
   occupyPlace: function(placeID) {
-    // W przyszlosci do tworzenia logow dla admina 
-    // i do wyswietlania kto zajmuje plac.
-    // Funkcja powyzej tez zakomentowana.
-    // Do parametrow ponizej trzeba bedzie dodac tego usera
-
-    // var instructor = OSK_Helper.getInstructorID;
     var socket = window.socket;
     socket.emit('placeIsOccupied', {place: placeID, instructor: window.localStorage["instructor_id"]});
   },

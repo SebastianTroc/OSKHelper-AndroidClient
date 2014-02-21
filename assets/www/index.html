@@ -58,7 +58,33 @@
 		<footer data-role="footer" data-position="fixed" class="footer">
 			<h4>&copy; Sebastian Troć</h4>
 		</footer>
-	</div><!-- /#login-->
+	</div><!-- /#splashscreen-->
+
+
+	<div data-role="page" id="server-config" data-theme='b'>
+		<header data-role="header" data-position="fixed" class="header" data-tap-toggle="false" data-theme='b'>
+			<h1>
+				<a href="#"><i class='icon-dashboard'></i></a>
+				OSK Helper
+			</h1>
+		</header>
+
+		<section data-role="content">
+
+			<div class="inset">
+				<h2>Konfiguracja</h2>
+				<h3>Proszę podać poprawny adres serwera:</h3>
+				
+				<form id="serverForm" action="" method="post">
+	        <input type="text" name="host" id="host" value="" placeholder="host" />
+	        <input type="text" name="port" id="port" value="" placeholder="port" />
+					<button id="checkServerButton" data-theme="b">Zapisz</button>
+				</form>
+			</div>
+		</section>
+
+	</div><!-- /#server-config-->
+
 
 	<div data-role="page" id="login" data-theme='b'>
 		<header data-role="header" data-position="fixed" class="header" data-tap-toggle="false" data-theme='b'>
