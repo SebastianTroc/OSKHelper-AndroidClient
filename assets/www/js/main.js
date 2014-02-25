@@ -29,7 +29,7 @@ var OSK_Helper = {
       tx.executeSql('DROP TABLE IF EXISTS places');
       tx.executeSql('CREATE TABLE IF NOT EXISTS places (id unique, address, name, photo, occupated, coordinates)');
       $.each(data.places, function(index, elem){
-        tx.executeSql('INSERT INTO places (id, address, name, photo, occupated, coordinates) VALUES ("'+ elem._id + '", "' + elem.address + '", "' + elem.name + '", "'  + elem.photoBase64 + '", "' + elem.occupated + '", "' + elem.coordinates.lat + ',' + elem.coordinates.lng + '")');
+        tx.executeSql('INSERT INTO places (id, address, name, photo, occupated, coordinates) VALUES ("'+ elem._id + '", "' + elem.address + '", "' + elem.name + '", "'  + elem.photoBase64 + '", "' + elem.occupation.occupied + '", "' + elem.coordinates.lat + ',' + elem.coordinates.lng + '")');
         OSK_Helper.renderPlacesListElem(elem); // render place list item
         freePlaces++; // increment free places count
       });
@@ -64,6 +64,7 @@ var OSK_Helper = {
 
   // Renders places list based on JSON from API
   renderPlacesListElem: function(jsonData) {
+    console.log(jsonData);
     var template = $('#placesListElemTmpl').html();
     var html = Mustache.to_html(template, jsonData);
     $('#places-list').append(html);
@@ -385,10 +386,8 @@ var OSK_Helper = {
   // Establishing Socket.io connection and configure socket's events
   openWebSocket: function() {
 
-    'http://' + window.localStorage['serverHost'] + ':' + window.localStorage['serverPort']
-
-    window.socket = io.connect(AppConfig.api_server.host, {
-      port: AppConfig.api_server.port
+    window.socket = io.connect(window.localStorage['serverHost'], {
+      port: window.localStorage['serverPort'] || '80'
     });
     var socket = window.socket;
 

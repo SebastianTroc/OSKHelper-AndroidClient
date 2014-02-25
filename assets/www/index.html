@@ -213,7 +213,7 @@
 
 
 	<script id="placesListElemTmpl" type="text/template">
-		<li class="place" data-distance="0">
+		<li class="place{{#occupation}}{{#occupied}} disabled{{/occupied}}{{/occupation}}" data-distance="0">
 			<a href="#" data-place="{{_id}}" data-coords='{ "lat":"{{coordinates.lat}}", "lng": "{{coordinates.lng}}" }' id="place_{{_id}}" class="occupyPlaceTrigger">
 				<img src="{{photoBase64}}" alt="{{name}}" />
 				<h2 class="place-name">{{name}}</h2>
