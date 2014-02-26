@@ -16,8 +16,37 @@ var OSK_Helper = {
       console.log('checkServerExists');
       OSK_Helper.checkServerExists();
     }
+
+    OSK_Helper.backButton();
+
+    document.addEventListener("backbutton", OSK_Helper.onBackKeyPress, false);
   },
 
+
+  backButton: function() {
+
+    document.addEventListener("deviceready", onDeviceReady, false);
+    function onDeviceReady() {
+      document.addEventListener("backbutton", onBackKeyPress, false);
+    }
+    function onBackKeyPress() {
+      if ($.mobile.activePage.attr('id') == 'place-details') {
+
+        $('#releasePlace').trigger('click');
+
+      } else {
+      
+        if (confirm("Zamknąć aplikację?")) {
+          navigator.app.exitApp();
+        }
+        else {
+          $.mobile.changePage('#places');  
+          return false;
+        }
+
+      }
+    }
+  },
 
   // save downloaded places to HTML5 WebStorage
   prepareDatabase_Places: function(data) {
